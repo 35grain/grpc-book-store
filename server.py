@@ -434,8 +434,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
                         # Same logic as above
                         if response.operations and head.getCleanOperations() - response.operations <= 5:
                             response = stub.SetProcessData(
-                                pb.SetProcessDataRequest(process_id=prev_head_id, operations=head.getCleanOperations(),
-                                                         books=head.books))
+                                pb.SetProcessDataRequest(process_id=prev_head_id, operations=head.getCleanOperations(), books=head.books))
                             if response.success:
                                 self.replication_chain.insert(0, prev_head_id)
                                 success = self.propagateChain(self.replication_chain, prev_head_id)
