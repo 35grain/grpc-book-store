@@ -435,7 +435,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
                         if response.operations and head.getCleanOperations() - response.operations <= 5:
                             books = []
                             for book_name, book in response.books.items():
-                                books.append(pb.Book(name=book_name, price=book.price, status=book.status))
+                                books.append(pb.Book(book_name=book_name, price=book.price, status=book.status))
                             response = stub.SetProcessData(
                                 pb.SetProcessDataRequest(process_id=prev_head_id, operations=head.getCleanOperations(), books=books))
                             if response.success:
@@ -473,7 +473,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
             process = self.processes[process_id]
             books = {}
             for book in request.books:
-                books[book.name] = (book.price, book.status)
+                books[book.book_name] = (book.price, book.status)
             process.setData(request.operations, books)
             return pb.SetProcessDataResponse(success=True, message=f"Process {process_id} data set.")
         return pb.SetProcessDataResponse(success=False,
