@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+service BookStore {
+    rpc UpdateBook (UpdateBookRequest) returns (UpdateBookResponse) {}
+    rpc CreateStorePS (CreateStorePSRequest) returns (CreateStorePSResponse) {}
+    rpc CreateChain (CreateChainRequest) returns (CreateChainResponse) {}
+    rpc GetProcesses (GetProcessesRequest) returns (GetProcessesResponse) {}
+    rpc ListChain (ListChainRequest) returns (ListChainResponse) {}
+    rpc ListBooks (ListBooksRequest) returns (ListBooksResponse) {}
+    rpc PropagateChain (PropagateChainRequest) returns (PropagateChainResponse) {}
+    rpc WriteOperation (WriteOperationRequest) returns (WriteOperationResponse) {}
+    rpc ReadOperation (ReadOperationRequest) returns (ReadOperationResponse) {}
+    rpc DataStatus (DataStatusRequest) returns (DataStatusResponse) {}
+    rpc RemoveHead (RemoveHeadRequest) returns (RemoveHeadResponse) {}
+    rpc RestoreHead (RestoreHeadRequest) returns (RestoreHeadResponse) {}
+    rpc SetTimeout (SetTimeoutRequest) returns (SetTimeoutResponse) {}
+    rpc PropagateTimeout (SetTimeoutRequest) returns (PropagateTimeoutResponse) {}
+    rpc SetClean (SetCleanRequest) returns (SetCleanResponse) {}
+}
+
+message SetCleanRequest {
+    string book_name = 1;
+    double price = 2;
+    string process_id = 3;
+}
+
+message SetCleanResponse {
+    bool success = 1;
+}
+
+message UpdateBookRequest {
+    string book_name = 1;
+    double price = 2;
+    string process_id = 3;
+}
+
+message UpdateBookResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message CreateStorePSRequest {
+    int32 num_processes = 1;
+}
+
+message CreateStorePSResponse {
+    repeated string process_ids = 1;
+}
+
+message CreateChainRequest {}
+
+message CreateChainResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message GetProcessesRequest {}
+
+message GetProcessesResponse {
+    bool success = 1;
+    string message = 2;
+    repeated string process_ids = 3;
+}
+
+message ListChainRequest {}
+
+message ListChainResponse {
+    repeated string chain = 1;
+}
+
+message PropagateChainRequest {
+    repeated string chain = 1;
+}
+
+message PropagateChainResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message WriteOperationRequest {
+    string book_name = 1;
+    double price = 2;
+}
+
+message WriteOperationResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message ListBooksRequest {}
+
+message ListBooksResponse {
+    bool success = 1;
+    string message = 2;
+    repeated string books = 3;
+}
+
+message ReadOperationRequest {
+    string book_name = 1;
+}
+
+message ReadOperationResponse {
+    bool success = 1;
+    string message = 2;
+    string price = 3;
+}
+
+message DataStatusRequest {}
+
+message DataStatusResponse {
+    bool success = 1;
+    string message = 2;
+    repeated string statuses = 3;
+}
+
+message RemoveHeadRequest {}
+
+message RemoveHeadResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message RestoreHeadRequest {}
+
+message RestoreHeadResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message SetTimeoutRequest {
+    int32 time = 1;
+}
+
+message SetTimeoutResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message PropagateTimeoutResponse {
+    bool success = 1;
+    string message = 2;
+}
