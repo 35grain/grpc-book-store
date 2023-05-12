@@ -149,6 +149,7 @@ message GetOperationsRequest {
 }
 
 message GetOperationsResponse {
+    bool success = 1;
     int32 operations = 2;
 }
 
