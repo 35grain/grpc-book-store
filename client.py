@@ -15,6 +15,13 @@ def createChain(stub, node_id):
         print(f"Node {node_id}> Chain created. List with 'List-chain'.")
     else:
         print(f"Node {node_id}> {response.message}")
+        
+def resetChain(stub, node_id):
+    response = stub.ResetChain(pb.ResetChainRequest())
+    if response.success:
+        print(f"Node {node_id}> Chain reset. List with 'List-chain'.")
+    else:
+        print(f"Node {node_id}> {response.message}")
     
 def listChain(stub, node_id):
     response = stub.ListChain(pb.ListChainRequest())
@@ -102,6 +109,8 @@ def terminal(nodes, node_id, quit_event):
                 restoreHead(stub, node_id)
             elif command == 'time-out':
                 setTimeout(stub, node_id)
+            elif command == 'reset-chain':
+                resetChain(stub, node_id)
             elif command == 'quit':
                 # Exit all threads
                 quit_event.set()
