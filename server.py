@@ -433,8 +433,11 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
 
                         # Same logic as above
                         if response.operations and head.getCleanOperations() - response.operations <= 5:
+                            books = []
+                            for book_name, book in response.books.items():
+                                books.append(pb.Book(name=book_name, price=book.price, status=book.status))
                             response = stub.SetProcessData(
-                                pb.SetProcessDataRequest(process_id=prev_head_id, operations=head.getCleanOperations(), books=head.books))
+                                pb.SetProcessDataRequest(process_id=prev_head_id, operations=head.getCleanOperations(), books=books))
                             if response.success:
                                 self.replication_chain.insert(0, prev_head_id)
                                 success = self.propagateChain(self.replication_chain, prev_head_id)
@@ -468,7 +471,10 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
         process_id = request.process_id
         if process_id in self.processes:
             process = self.processes[process_id]
-            process.setData(request.operations, request.books)
+            books = {}
+            for book in request.books:
+                books[book.name] = (book.price, book.status)
+            process.setData(request.operations, books)
             return pb.SetProcessDataResponse(success=True, message=f"Process {process_id} data set.")
         return pb.SetProcessDataResponse(success=False,
                                          message=f"Process {process_id} does not exist on node {self.node_id}!")

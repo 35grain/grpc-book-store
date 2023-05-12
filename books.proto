@@ -156,12 +156,13 @@ message GetOperationsResponse {
 message SetProcessDataRequest {
     string process_id = 1;
     int32 operations = 2;
-    map<string, Book> books = 3;
+    repeated Book books = 3;
 }
 
 message Book {
-    double price = 1;
-    string status = 2;
+    string book_name = 1;
+    double price = 2;
+    string status = 3;
 }
 
 message SetProcessDataResponse {
