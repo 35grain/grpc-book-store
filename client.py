@@ -2,6 +2,8 @@ import grpc
 import books_pb2 as pb
 import books_pb2_grpc as pb_grpc
 
+# Will assume the code below is self-explanatory
+
 def createStore(stub, node_id):
     num_processes = int(input(f"Node {node_id}> Number of processes: "))
     response = stub.CreateStorePS(pb.CreateStorePSRequest(num_processes=num_processes))
@@ -16,6 +18,8 @@ def createChain(stub, node_id):
     
 def listChain(stub, node_id):
     response = stub.ListChain(pb.ListChainRequest())
+    response.chain[0] += " (HEAD)"
+    response.chain[-1] += " (TAIL)"
     print(f"Node {node_id}>\nChain: {' -> '.join(response.chain)}")
     
 def writeOp(stub, node_id):
@@ -99,6 +103,7 @@ def terminal(nodes, node_id, quit_event):
             elif command == 'time-out':
                 setTimeout(stub, node_id)
             elif command == 'quit':
+                # Exit all threads
                 quit_event.set()
             elif len(command):
                 print(f"Node {node_id}> Unknown command. Please try again!")

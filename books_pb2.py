@@ -13,13 +13,15 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x62ooks.proto\"G\n\x0fSetCleanRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\x12\x12\n\nprocess_id\x18\x03 \x01(\t\"#\n\x10SetCleanResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"I\n\x11UpdateBookRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\x12\x12\n\nprocess_id\x18\x03 \x01(\t\"6\n\x12UpdateBookResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"-\n\x14\x43reateStorePSRequest\x12\x15\n\rnum_processes\x18\x01 \x01(\x05\",\n\x15\x43reateStorePSResponse\x12\x13\n\x0bprocess_ids\x18\x01 \x03(\t\"\x14\n\x12\x43reateChainRequest\"7\n\x13\x43reateChainResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x15\n\x13GetProcessesRequest\"M\n\x14GetProcessesResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x13\n\x0bprocess_ids\x18\x03 \x03(\t\"\x12\n\x10ListChainRequest\"\"\n\x11ListChainResponse\x12\r\n\x05\x63hain\x18\x01 \x03(\t\"&\n\x15PropagateChainRequest\x12\r\n\x05\x63hain\x18\x01 \x03(\t\":\n\x16PropagateChainResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"9\n\x15WriteOperationRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\":\n\x16WriteOperationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x12\n\x10ListBooksRequest\"D\n\x11ListBooksResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\r\n\x05\x62ooks\x18\x03 \x03(\t\")\n\x14ReadOperationRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\"H\n\x15ReadOperationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\r\n\x05price\x18\x03 \x01(\t\"\x13\n\x11\x44\x61taStatusRequest\"H\n\x12\x44\x61taStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x10\n\x08statuses\x18\x03 \x03(\t\"\x13\n\x11RemoveHeadRequest\"6\n\x12RemoveHeadResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x14\n\x12RestoreHeadRequest\"7\n\x13RestoreHeadResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"!\n\x11SetTimeoutRequest\x12\x0c\n\x04time\x18\x01 \x01(\x05\"6\n\x12SetTimeoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"<\n\x18PropagateTimeoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\x98\x07\n\tBookStore\x12\x37\n\nUpdateBook\x12\x12.UpdateBookRequest\x1a\x13.UpdateBookResponse\"\x00\x12@\n\rCreateStorePS\x12\x15.CreateStorePSRequest\x1a\x16.CreateStorePSResponse\"\x00\x12:\n\x0b\x43reateChain\x12\x13.CreateChainRequest\x1a\x14.CreateChainResponse\"\x00\x12=\n\x0cGetProcesses\x12\x14.GetProcessesRequest\x1a\x15.GetProcessesResponse\"\x00\x12\x34\n\tListChain\x12\x11.ListChainRequest\x1a\x12.ListChainResponse\"\x00\x12\x34\n\tListBooks\x12\x11.ListBooksRequest\x1a\x12.ListBooksResponse\"\x00\x12\x43\n\x0ePropagateChain\x12\x16.PropagateChainRequest\x1a\x17.PropagateChainResponse\"\x00\x12\x43\n\x0eWriteOperation\x12\x16.WriteOperationRequest\x1a\x17.WriteOperationResponse\"\x00\x12@\n\rReadOperation\x12\x15.ReadOperationRequest\x1a\x16.ReadOperationResponse\"\x00\x12\x37\n\nDataStatus\x12\x12.DataStatusRequest\x1a\x13.DataStatusResponse\"\x00\x12\x37\n\nRemoveHead\x12\x12.RemoveHeadRequest\x1a\x13.RemoveHeadResponse\"\x00\x12:\n\x0bRestoreHead\x12\x13.RestoreHeadRequest\x1a\x14.RestoreHeadResponse\"\x00\x12\x37\n\nSetTimeout\x12\x12.SetTimeoutRequest\x1a\x13.SetTimeoutResponse\"\x00\x12\x43\n\x10PropagateTimeout\x12\x12.SetTimeoutRequest\x1a\x19.PropagateTimeoutResponse\"\x00\x12\x31\n\x08SetClean\x12\x10.SetCleanRequest\x1a\x11.SetCleanResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x62ooks.proto\"G\n\x0fSetCleanRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\x12\x12\n\nprocess_id\x18\x03 \x01(\t\"#\n\x10SetCleanResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"I\n\x11UpdateBookRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\x12\x12\n\nprocess_id\x18\x03 \x01(\t\"6\n\x12UpdateBookResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"-\n\x14\x43reateStorePSRequest\x12\x15\n\rnum_processes\x18\x01 \x01(\x05\",\n\x15\x43reateStorePSResponse\x12\x13\n\x0bprocess_ids\x18\x01 \x03(\t\"\x14\n\x12\x43reateChainRequest\"7\n\x13\x43reateChainResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x15\n\x13GetProcessesRequest\"M\n\x14GetProcessesResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x13\n\x0bprocess_ids\x18\x03 \x03(\t\"\x12\n\x10ListChainRequest\"\"\n\x11ListChainResponse\x12\r\n\x05\x63hain\x18\x01 \x03(\t\"8\n\x15PropagateChainRequest\x12\r\n\x05\x63hain\x18\x01 \x03(\t\x12\x10\n\x08new_head\x18\x02 \x01(\t\":\n\x16PropagateChainResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"9\n\x15WriteOperationRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\x12\r\n\x05price\x18\x02 \x01(\x01\":\n\x16WriteOperationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x12\n\x10ListBooksRequest\"D\n\x11ListBooksResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\r\n\x05\x62ooks\x18\x03 \x03(\t\")\n\x14ReadOperationRequest\x12\x11\n\tbook_name\x18\x01 \x01(\t\"H\n\x15ReadOperationResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\r\n\x05price\x18\x03 \x01(\t\"\x13\n\x11\x44\x61taStatusRequest\"H\n\x12\x44\x61taStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x10\n\x08statuses\x18\x03 \x03(\t\"\x13\n\x11RemoveHeadRequest\"6\n\x12RemoveHeadResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x14\n\x12RestoreHeadRequest\"7\n\x13RestoreHeadResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"!\n\x11SetTimeoutRequest\x12\x0c\n\x04time\x18\x01 \x01(\x05\"6\n\x12SetTimeoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"<\n\x18PropagateTimeoutResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"*\n\x14GetOperationsRequest\x12\x12\n\nprocess_id\x18\x01 \x01(\t\"+\n\x15GetOperationsResponse\x12\x12\n\noperations\x18\x02 \x01(\x05\"\xa6\x01\n\x15SetProcessDataRequest\x12\x12\n\nprocess_id\x18\x01 \x01(\t\x12\x12\n\noperations\x18\x02 \x01(\x05\x12\x30\n\x05\x62ooks\x18\x03 \x03(\x0b\x32!.SetProcessDataRequest.BooksEntry\x1a\x33\n\nBooksEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x14\n\x05value\x18\x02 \x01(\x0b\x32\x05.Book:\x02\x38\x01\"%\n\x04\x42ook\x12\r\n\x05price\x18\x01 \x01(\x01\x12\x0e\n\x06status\x18\x02 \x01(\t\":\n\x16SetProcessDataResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\x9f\x08\n\tBookStore\x12\x37\n\nUpdateBook\x12\x12.UpdateBookRequest\x1a\x13.UpdateBookResponse\"\x00\x12@\n\rCreateStorePS\x12\x15.CreateStorePSRequest\x1a\x16.CreateStorePSResponse\"\x00\x12:\n\x0b\x43reateChain\x12\x13.CreateChainRequest\x1a\x14.CreateChainResponse\"\x00\x12=\n\x0cGetProcesses\x12\x14.GetProcessesRequest\x1a\x15.GetProcessesResponse\"\x00\x12\x34\n\tListChain\x12\x11.ListChainRequest\x1a\x12.ListChainResponse\"\x00\x12\x34\n\tListBooks\x12\x11.ListBooksRequest\x1a\x12.ListBooksResponse\"\x00\x12\x43\n\x0ePropagateChain\x12\x16.PropagateChainRequest\x1a\x17.PropagateChainResponse\"\x00\x12\x43\n\x0eWriteOperation\x12\x16.WriteOperationRequest\x1a\x17.WriteOperationResponse\"\x00\x12@\n\rReadOperation\x12\x15.ReadOperationRequest\x1a\x16.ReadOperationResponse\"\x00\x12\x37\n\nDataStatus\x12\x12.DataStatusRequest\x1a\x13.DataStatusResponse\"\x00\x12\x37\n\nRemoveHead\x12\x12.RemoveHeadRequest\x1a\x13.RemoveHeadResponse\"\x00\x12:\n\x0bRestoreHead\x12\x13.RestoreHeadRequest\x1a\x14.RestoreHeadResponse\"\x00\x12\x37\n\nSetTimeout\x12\x12.SetTimeoutRequest\x1a\x13.SetTimeoutResponse\"\x00\x12\x43\n\x10PropagateTimeout\x12\x12.SetTimeoutRequest\x1a\x19.PropagateTimeoutResponse\"\x00\x12\x31\n\x08SetClean\x12\x10.SetCleanRequest\x1a\x11.SetCleanResponse\"\x00\x12@\n\rGetOperations\x12\x15.GetOperationsRequest\x1a\x16.GetOperationsResponse\"\x00\x12\x43\n\x0eSetProcessData\x12\x16.SetProcessDataRequest\x1a\x17.SetProcessDataResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'books_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
+  _SETPROCESSDATAREQUEST_BOOKSENTRY._options = None
+  _SETPROCESSDATAREQUEST_BOOKSENTRY._serialized_options = b'8\001'
   _SETCLEANREQUEST._serialized_start=15
   _SETCLEANREQUEST._serialized_end=86
   _SETCLEANRESPONSE._serialized_start=88
@@ -45,39 +47,51 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _LISTCHAINRESPONSE._serialized_start=550
   _LISTCHAINRESPONSE._serialized_end=584
   _PROPAGATECHAINREQUEST._serialized_start=586
-  _PROPAGATECHAINREQUEST._serialized_end=624
-  _PROPAGATECHAINRESPONSE._serialized_start=626
-  _PROPAGATECHAINRESPONSE._serialized_end=684
-  _WRITEOPERATIONREQUEST._serialized_start=686
-  _WRITEOPERATIONREQUEST._serialized_end=743
-  _WRITEOPERATIONRESPONSE._serialized_start=745
-  _WRITEOPERATIONRESPONSE._serialized_end=803
-  _LISTBOOKSREQUEST._serialized_start=805
-  _LISTBOOKSREQUEST._serialized_end=823
-  _LISTBOOKSRESPONSE._serialized_start=825
-  _LISTBOOKSRESPONSE._serialized_end=893
-  _READOPERATIONREQUEST._serialized_start=895
-  _READOPERATIONREQUEST._serialized_end=936
-  _READOPERATIONRESPONSE._serialized_start=938
-  _READOPERATIONRESPONSE._serialized_end=1010
-  _DATASTATUSREQUEST._serialized_start=1012
-  _DATASTATUSREQUEST._serialized_end=1031
-  _DATASTATUSRESPONSE._serialized_start=1033
-  _DATASTATUSRESPONSE._serialized_end=1105
-  _REMOVEHEADREQUEST._serialized_start=1107
-  _REMOVEHEADREQUEST._serialized_end=1126
-  _REMOVEHEADRESPONSE._serialized_start=1128
-  _REMOVEHEADRESPONSE._serialized_end=1182
-  _RESTOREHEADREQUEST._serialized_start=1184
-  _RESTOREHEADREQUEST._serialized_end=1204
-  _RESTOREHEADRESPONSE._serialized_start=1206
-  _RESTOREHEADRESPONSE._serialized_end=1261
-  _SETTIMEOUTREQUEST._serialized_start=1263
-  _SETTIMEOUTREQUEST._serialized_end=1296
-  _SETTIMEOUTRESPONSE._serialized_start=1298
-  _SETTIMEOUTRESPONSE._serialized_end=1352
-  _PROPAGATETIMEOUTRESPONSE._serialized_start=1354
-  _PROPAGATETIMEOUTRESPONSE._serialized_end=1414
-  _BOOKSTORE._serialized_start=1417
-  _BOOKSTORE._serialized_end=2337
+  _PROPAGATECHAINREQUEST._serialized_end=642
+  _PROPAGATECHAINRESPONSE._serialized_start=644
+  _PROPAGATECHAINRESPONSE._serialized_end=702
+  _WRITEOPERATIONREQUEST._serialized_start=704
+  _WRITEOPERATIONREQUEST._serialized_end=761
+  _WRITEOPERATIONRESPONSE._serialized_start=763
+  _WRITEOPERATIONRESPONSE._serialized_end=821
+  _LISTBOOKSREQUEST._serialized_start=823
+  _LISTBOOKSREQUEST._serialized_end=841
+  _LISTBOOKSRESPONSE._serialized_start=843
+  _LISTBOOKSRESPONSE._serialized_end=911
+  _READOPERATIONREQUEST._serialized_start=913
+  _READOPERATIONREQUEST._serialized_end=954
+  _READOPERATIONRESPONSE._serialized_start=956
+  _READOPERATIONRESPONSE._serialized_end=1028
+  _DATASTATUSREQUEST._serialized_start=1030
+  _DATASTATUSREQUEST._serialized_end=1049
+  _DATASTATUSRESPONSE._serialized_start=1051
+  _DATASTATUSRESPONSE._serialized_end=1123
+  _REMOVEHEADREQUEST._serialized_start=1125
+  _REMOVEHEADREQUEST._serialized_end=1144
+  _REMOVEHEADRESPONSE._serialized_start=1146
+  _REMOVEHEADRESPONSE._serialized_end=1200
+  _RESTOREHEADREQUEST._serialized_start=1202
+  _RESTOREHEADREQUEST._serialized_end=1222
+  _RESTOREHEADRESPONSE._serialized_start=1224
+  _RESTOREHEADRESPONSE._serialized_end=1279
+  _SETTIMEOUTREQUEST._serialized_start=1281
+  _SETTIMEOUTREQUEST._serialized_end=1314
+  _SETTIMEOUTRESPONSE._serialized_start=1316
+  _SETTIMEOUTRESPONSE._serialized_end=1370
+  _PROPAGATETIMEOUTRESPONSE._serialized_start=1372
+  _PROPAGATETIMEOUTRESPONSE._serialized_end=1432
+  _GETOPERATIONSREQUEST._serialized_start=1434
+  _GETOPERATIONSREQUEST._serialized_end=1476
+  _GETOPERATIONSRESPONSE._serialized_start=1478
+  _GETOPERATIONSRESPONSE._serialized_end=1521
+  _SETPROCESSDATAREQUEST._serialized_start=1524
+  _SETPROCESSDATAREQUEST._serialized_end=1690
+  _SETPROCESSDATAREQUEST_BOOKSENTRY._serialized_start=1639
+  _SETPROCESSDATAREQUEST_BOOKSENTRY._serialized_end=1690
+  _BOOK._serialized_start=1692
+  _BOOK._serialized_end=1729
+  _SETPROCESSDATARESPONSE._serialized_start=1731
+  _SETPROCESSDATARESPONSE._serialized_end=1789
+  _BOOKSTORE._serialized_start=1792
+  _BOOKSTORE._serialized_end=2847
 # @@protoc_insertion_point(module_scope)

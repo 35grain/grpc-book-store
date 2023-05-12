@@ -16,6 +16,8 @@ service BookStore {
     rpc SetTimeout (SetTimeoutRequest) returns (SetTimeoutResponse) {}
     rpc PropagateTimeout (SetTimeoutRequest) returns (PropagateTimeoutResponse) {}
     rpc SetClean (SetCleanRequest) returns (SetCleanResponse) {}
+    rpc GetOperations (GetOperationsRequest) returns (GetOperationsResponse) {}
+    rpc SetProcessData (SetProcessDataRequest) returns (SetProcessDataResponse) {}
 }
 
 message SetCleanRequest {
@@ -70,6 +72,7 @@ message ListChainResponse {
 
 message PropagateChainRequest {
     repeated string chain = 1;
+    string new_head = 2;
 }
 
 message PropagateChainResponse {
@@ -137,6 +140,30 @@ message SetTimeoutResponse {
 }
 
 message PropagateTimeoutResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message GetOperationsRequest {
+    string process_id = 1;
+}
+
+message GetOperationsResponse {
+    int32 operations = 2;
+}
+
+message SetProcessDataRequest {
+    string process_id = 1;
+    int32 operations = 2;
+    map<string, Book> books = 3;
+}
+
+message Book {
+    double price = 1;
+    string status = 2;
+}
+
+message SetProcessDataResponse {
     bool success = 1;
     string message = 2;
 }

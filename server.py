@@ -19,6 +19,9 @@ class ProcessThread(threading.Thread):
         self.predecessor = None
         self.update_queue = [] # [(book_name, price, time)]
         self.timeout = 0  # in seconds
+        self.previous_head = None
+        self.operations = 0
+        self.clean_operations = 0
         
     def setTimeout(self, timeout):
         self.timeout = timeout
@@ -52,9 +55,9 @@ class ProcessThread(threading.Thread):
         self.stopped.set()
         
     def writeOp(self, book_name, price):
-        print("Write op.", self.process_id)
         status = "dirty"
         self.books[book_name] = (price, status)
+        self.operations += 1
         if self.tail == self.process_id:
             return self.setClean(book_name, price)
         self.update_queue.append((book_name, price, time.time()))
@@ -63,6 +66,7 @@ class ProcessThread(threading.Thread):
     def setClean(self, book_name, price):
         if book_name in self.books and self.books[book_name][0] == price:
             self.books[book_name] = (self.books[book_name][0], "clean")
+            self.clean_operations += 1
             if self.head != self.process_id:
                 channel = grpc.insecure_channel(self.getPrecursorAddress())
                 stub = pb_grpc.BookStoreStub(channel)
@@ -90,6 +94,23 @@ class ProcessThread(threading.Thread):
         for i, (book_name, (price, status)) in enumerate(self.books.items()):
             statuses.append(str(i + 1) + ") " + book_name + " - " + status)
         return statuses
+    
+    def getPreviousHead(self):
+        return self.previous_head
+    
+    def setPreviousHead(self, head):
+        self.previous_head = head
+        
+    def getOperations(self):
+        return self.operations
+    
+    def getCleanOperations(self):
+        return self.clean_operations
+    
+    def setData(self, operations, books):
+        self.operations = operations
+        self.clean_operations = operations
+        self.books = books
 
 class BookStoreServicer(pb_grpc.BookStoreServicer):
     def __init__(self, nodes, node_id):
@@ -98,7 +119,8 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
         self.processes = {}  # {process_id: process_thread}
         self.replication_chain = []
         self.timeout = 60  # in seconds
-        
+       
+    # Get the address of the head of the replication chain   
     def getHeadAddress(self):
         if self.replication_chain:
             node = int(self.replication_chain[0].split("-")[0][-1])
@@ -106,6 +128,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
         else:
             return None
 
+    # Create local store processes
     def CreateStorePS(self, request, context):
         node_id = self.node_id
         num_processes = request.num_processes
@@ -120,12 +143,13 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
 
         return pb.CreateStorePSResponse(process_ids=process_ids)
 
+    # Create replication chain
     def CreateChain(self, request, context):
         if len(self.processes) == 0:
             return pb.CreateChainResponse(success=False, message="Processes not created yet! Use `Local-store-ps`.")
         
         if self.replication_chain:
-            return pb.CreateChainResponse(success=False, message="Chain already exists!")
+            return pb.CreateChainResponse(success=False, message="Chain already exists! ")
 
         process_ids = list(self.processes.keys())
         for id, addr in self.nodes.items():
@@ -139,33 +163,21 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
                     return pb.CreateChainResponse(success=False, message=response.message)
         
         random.shuffle(process_ids)
-        head = process_ids[0]
-        tail = process_ids[-1]
-        self.head = head
-        self.tail = tail
-        self.replication_chain = process_ids
-
-        # Update successor and predecessor references
-        for i, process_id in enumerate(process_ids):
-            if process_id in self.processes:
-                process = self.processes[process_id]
-                process.head = head
-                process.tail = tail
-                process.successor = process_ids[(i + 1) % len(process_ids)]
-                process.predecessor = process_ids[(i - 1) % len(process_ids)]
-            
         success = self.propagateChain(process_ids)
         return pb.CreateChainResponse(success=success)
     
+    # Get node processes
     def GetProcesses(self, request, context):
         if len(self.processes) == 0:
             return pb.GetProcessesResponse(success=False, message=f"Node {self.node_id} processes have not been created yet!")
         return pb.GetProcessesResponse(success=True, process_ids=list(self.processes.keys()))
     
+    # Update chain
     def PropagateChain(self, request, context):
         process_ids = request.chain
+        new_head = request.new_head
 
-        if self.replication_chain:
+        if self.replication_chain and not new_head:
             return pb.PropagateChainResponse(success=False, message="Chain already exists!")
 
         self.replication_chain = process_ids
@@ -174,23 +186,28 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
         for i, process_id in enumerate(process_ids):
             if process_id in self.processes:
                 process = self.processes[process_id]
+                if new_head and new_head == process_id:
+                    process.setPreviousHead(process.head)
+                elif new_head and process.getPreviousHead() == new_head:
+                    process.setPreviousHead(None)
                 process.head = process_ids[0]
                 process.tail = process_ids[-1]
                 process.successor = process_ids[(i + 1) % len(process_ids)]
                 process.predecessor = process_ids[(i - 1) % len(process_ids)]
-
-        return pb.PropagateChainResponse(success=True, message="Chain created.")
+                
+        return pb.PropagateChainResponse(success=True, message="Chain updated.")
     
-    def propagateChain(self, process_ids):
+    # Propagate the new chain to all nodes
+    def propagateChain(self, process_ids, new_head=None):
         for id, addr in self.nodes.items():
-            if id != self.node_id:
-                channel = grpc.insecure_channel(addr)
-                stub = pb_grpc.BookStoreStub(channel)
-                response = stub.PropagateChain(pb.PropagateChainRequest(chain=process_ids))
-                if not response.success:
-                    return False
+            channel = grpc.insecure_channel(addr)
+            stub = pb_grpc.BookStoreStub(channel)
+            response = stub.PropagateChain(pb.PropagateChainRequest(chain=process_ids, new_head=new_head))
+            if not response.success:
+                return False
         return True
 
+    # List the chain
     def ListChain(self, request, context):
         if not self.replication_chain:
             return pb.ListChainResponse(message="Chain does not exist.")
@@ -226,14 +243,16 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
             success = self.processes[head_process].writeOp(book_name, price)
             if success:
                 return pb.WriteOperationResponse(success=success, message="Write successful.")
-            else:
-                return pb.WriteOperationResponse(success=False, message="Write failed.")
         else:
             address = self.getHeadAddress()
             channel = grpc.insecure_channel(address)
             stub = pb_grpc.BookStoreStub(channel)
-            return stub.WriteOperation(pb.WriteOperationRequest(book_name=book_name, price=price))
+            response = stub.WriteOperation(pb.WriteOperationRequest(book_name=book_name, price=price))
+            if response.success:
+                return pb.WriteOperationResponse(success=True, message="Write successful.")
+        return pb.WriteOperationResponse(success=False, message="Write failed.")
         
+    # Unclear what "consults" refers to so requesting data from head every time
     def ReadOperation(self, request, context):
         if not self.replication_chain:
             return pb.ReadOperationResponse(success=False, message="Chain does not exist!")
@@ -254,6 +273,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
             stub = pb_grpc.BookStoreStub(channel)
             return stub.ReadOperation(pb.ReadOperationRequest(book_name=book_name))
         
+    # List all books
     def ListBooks(self, request, context):
         if not self.replication_chain:
             return pb.ListBooksResponse(success=False, message="Chain does not exist!")
@@ -270,6 +290,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
             stub = pb_grpc.BookStoreStub(channel)
             return stub.ListBooks(pb.ListBooksRequest())
         
+    # Get the status of the data
     def DataStatus(self, request, context):
         if not self.replication_chain:
             return pb.DataStatusResponse(success=False, message="Chain does not exist!")
@@ -285,7 +306,8 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
             channel = grpc.insecure_channel(address)
             stub = pb_grpc.BookStoreStub(channel)
             return stub.DataStatus(pb.DataStatusRequest())
-        
+    
+    # Set book status to clean on the way back up the chain
     def SetClean(self, request, context):
         if not self.replication_chain:
             return pb.SetCleanResponse(success=False, message="Chain does not exist!")
@@ -303,7 +325,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
     # Current implementation sets a new timeout immediately for all nodes
     def SetTimeout(self, request, context):
         if not self.replication_chain:
-            return pb.SetTimeoutResponse(success=False, message="Chain does not exist! Use `Time-out` to create a chain first.")
+            return pb.SetTimeoutResponse(success=False, message="Chain does not exist! Use `Create-chain` to create a chain first.")
         
         timeout = request.time
         for addr in self.nodes.values():
@@ -315,6 +337,7 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
             
         return pb.SetTimeoutResponse(success=True, message=f"Timeout set to {timeout} seconds.")
     
+    # Propagate new timeout to all nodes in the chain
     def PropagateTimeout(self, request, context):
         if not self.replication_chain:
             return pb.PropagateTimeoutResponse(success=False, message=f"Node {self.node_id} chain does not exist!")
@@ -325,6 +348,111 @@ class BookStoreServicer(pb_grpc.BookStoreServicer):
         
         return pb.PropagateTimeoutResponse(success=True, message=f"Timeout set to {timeout} seconds.")
     
+    # Remove current chain head and save reference in new head
+    def RemoveHead(self, request, context):
+        if not self.replication_chain:
+            return pb.RemoveHeadResponse(success=False, message=f"Node {self.node_id} chain does not exist!")
+        
+        if len(self.replication_chain) == 1:
+            return pb.RemoveHeadResponse(success=False, message="Cannot remove head from a chain of length 1.")
+        
+        old_head_id = self.replication_chain[0]
+        if old_head_id in self.processes:
+            old_head = self.processes[old_head_id]
+            if old_head.getOperations() == old_head.getCleanOperations():
+                new_head_id = self.replication_chain[1]
+                self.replication_chain.remove(old_head_id)
+                success = self.propagateChain(self.replication_chain, new_head_id)
+                if not success:
+                    return pb.RemoveHeadResponse(success=False, message="Failed to remove head.")
+            else:
+                return pb.RemoveHeadResponse(success=False, message="Head cannot be removed because it is not clean.")
+        else:
+            address = self.getHeadAddress()
+            channel = grpc.insecure_channel(address)
+            stub = pb_grpc.BookStoreStub(channel)
+            response = stub.RemoveHead(pb.RemoveHeadRequest())
+            if not response.success:
+                return pb.RemoveHeadResponse(success=False, message=response.message)
+
+        return pb.RemoveHeadResponse(success=True, message="Head removed. See `List-chain` for updated chain.")
+    
+    # Restore the chain to the state it was in before the last `Remove-head` command
+    def RestoreHead(self, request, context):
+        if not self.replication_chain:
+            return pb.RestoreHeadResponse(success=False, message=f"Node {self.node_id} chain does not exist!")
+        
+        head_id = self.replication_chain[0]
+        if head_id in self.processes:
+            head = self.processes[self.replication_chain[0]]
+            prev_head_id = head.getPreviousHead()
+            if prev_head_id:
+                if head.getOperations() == head.getCleanOperations():
+                    if prev_head_id in self.processes:
+                        prev_head = self.processes[prev_head_id]
+                        if head.getCleanOperations() - prev_head.getCleanOperations() <= 5:
+                            prev_head.setData(head.getCleanOperations(), head.books)
+                            self.replication_chain.insert(0, prev_head_id)
+                            success = self.propagateChain(self.replication_chain, prev_head_id)
+                            if not success:
+                                return pb.RestoreHeadResponse(success=False, message="Failed to propagate head restoration.")
+                        else:
+                            prev_head.stop()
+                            return pb.RestoreHeadResponse(success=False, message="Previous head is too far behind to restore. Destroyed.")
+                    else:
+                        address = self.nodes[int(prev_head_id.split("-")[0][-1])]
+                        channel = grpc.insecure_channel(address)
+                        stub = pb_grpc.BookStoreStub(channel)
+                        response = stub.GetOperations(pb.GetOperationsRequest(process_id=prev_head_id))
+                        if response.operations and head.getCleanOperations() - response.operations <= 5:
+                            response = stub.SetProcessData(pb.SetProcessDataRequest(process_id=prev_head_id, operations=head.getCleanOperations(), books=head.books))
+                            if response.success:
+                                self.replication_chain.insert(0, prev_head_id)
+                                success = self.propagateChain(self.replication_chain, prev_head_id)
+                                if not success:
+                                    return pb.RestoreHeadResponse(success=False, message="Failed to propagate head restoration.")
+                            else:
+                                return pb.RestoreHeadResponse(success=False, message="Failed to restore head data.")
+                        else:
+                            return pb.RestoreHeadResponse(success=False, message="Previous head is too far behind to restore.")
+                else:
+                    return pb.RestoreHeadResponse(success=False, message="Head cannot be restored because it is not clean.")
+            else:
+                return pb.RestoreHeadResponse(success=False, message="No previous head to restore.")
+        else:
+            address = self.getHeadAddress()
+            channel = grpc.insecure_channel(address)
+            stub = pb_grpc.BookStoreStub(channel)
+            response = stub.RestoreHead(pb.RestoreHeadRequest())
+            if not response.success:
+                return pb.RestoreHeadResponse(success=False, message=response.message)
+        return pb.RestoreHeadResponse(success=True, message="Head restored. See `List-chain` for updated chain.")
+    
+    # Set process data
+    def SetProcessData(self, request, context):
+        if not self.replication_chain:
+            return pb.SetProcessDataResponse(success=False, message=f"Node {self.node_id} chain does not exist!")
+        
+        process_id = request.process_id
+        if process_id in self.processes:
+            process = self.processes[process_id]
+            process.setData(request.operations, request.books)
+            return pb.SetProcessDataResponse(success=True, message=f"Process {process_id} data set.")
+        return pb.SetProcessDataResponse(success=False, message=f"Process {process_id} does not exist on node {self.node_id}!")
+    
+    # Get process clean operations
+    def GetOperations(self, request, context):
+        if not self.replication_chain:
+            return pb.GetOperationsResponse(success=False, message=f"Node {self.node_id} chain does not exist!")
+        
+        process_id = request.process_id
+        if process_id in self.processes:
+            process = self.processes[process_id]
+            operations = process.getCleanOperations()
+        else:
+            return pb.GetOperationsResponse(success=False, message=f"Process {process_id} does not exist on node {self.node_id}!")
+        
+        return pb.GetOperationsResponse(success=True, operations=operations)
 
     def stop_processes(self):
         for process_thread in self.processes.values():

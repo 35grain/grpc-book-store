@@ -89,6 +89,16 @@ class BookStoreStub(object):
                 request_serializer=books__pb2.SetCleanRequest.SerializeToString,
                 response_deserializer=books__pb2.SetCleanResponse.FromString,
                 )
+        self.GetOperations = channel.unary_unary(
+                '/BookStore/GetOperations',
+                request_serializer=books__pb2.GetOperationsRequest.SerializeToString,
+                response_deserializer=books__pb2.GetOperationsResponse.FromString,
+                )
+        self.SetProcessData = channel.unary_unary(
+                '/BookStore/SetProcessData',
+                request_serializer=books__pb2.SetProcessDataRequest.SerializeToString,
+                response_deserializer=books__pb2.SetProcessDataResponse.FromString,
+                )
 
 
 class BookStoreServicer(object):
@@ -184,6 +194,18 @@ class BookStoreServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetOperations(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SetProcessData(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BookStoreServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -261,6 +283,16 @@ def add_BookStoreServicer_to_server(servicer, server):
                     servicer.SetClean,
                     request_deserializer=books__pb2.SetCleanRequest.FromString,
                     response_serializer=books__pb2.SetCleanResponse.SerializeToString,
+            ),
+            'GetOperations': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOperations,
+                    request_deserializer=books__pb2.GetOperationsRequest.FromString,
+                    response_serializer=books__pb2.GetOperationsResponse.SerializeToString,
+            ),
+            'SetProcessData': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetProcessData,
+                    request_deserializer=books__pb2.SetProcessDataRequest.FromString,
+                    response_serializer=books__pb2.SetProcessDataResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -524,5 +556,39 @@ class BookStore(object):
         return grpc.experimental.unary_unary(request, target, '/BookStore/SetClean',
             books__pb2.SetCleanRequest.SerializeToString,
             books__pb2.SetCleanResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetOperations(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/BookStore/GetOperations',
+            books__pb2.GetOperationsRequest.SerializeToString,
+            books__pb2.GetOperationsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SetProcessData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/BookStore/SetProcessData',
+            books__pb2.SetProcessDataRequest.SerializeToString,
+            books__pb2.SetProcessDataResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
